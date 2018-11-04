@@ -1,0 +1,22 @@
+# adjust led paths and values to device!
+redled='/sys/class/leds/red/brightness'
+red_max=255
+greenled='/sys/class/leds/green/brightness'
+green_max=255
+
+if pgrep -x "sshd" > /dev/null
+then
+  # sshd running - release wake lock, kill sshd, shine a red light
+  termux-wake-unlock
+  killall sshd
+  su -c "echo 255 > $redled"
+  sleep 5 && su -c "echo 0 > $redled"
+else
+  # sshd not running - aquire wake lock, run sshd, shine a green light
+  termux-wake-lock
+  sshd
+  su -c "echo 255 > $greenled"
+  sleep 5 && su -c "echo 0 > $greenled"
+
+fi
+  
